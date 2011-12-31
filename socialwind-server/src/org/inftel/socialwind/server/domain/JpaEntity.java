@@ -18,6 +18,7 @@ public abstract class JpaEntity {
     public abstract void setVersion(Long version);
 
     private Date created;
+    
     private Date updated;
 
     public Date getCreated() {

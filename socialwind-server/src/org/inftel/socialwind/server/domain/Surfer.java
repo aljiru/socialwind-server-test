@@ -1,13 +1,18 @@
 package org.inftel.socialwind.server.domain;
 
-import java.util.Date;
+import com.beoui.geocell.annotations.Geocells;
+import com.beoui.geocell.annotations.Latitude;
+import com.beoui.geocell.annotations.Longitude;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -37,9 +42,9 @@ public class Surfer extends JpaEntity {
 
     @Version
     private Long version;
-    
+
     private Long currentSpotId;
-    
+
     public String getDisplayName() {
         return displayName;
     }
@@ -87,4 +92,39 @@ public class Surfer extends JpaEntity {
     public Long getCurrentSpotId() {
         return currentSpotId;
     }
+
+    @Longitude
+    private Double longitude;
+
+    @Latitude
+    private Double latitude;
+
+    @Geocells
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<String> geoCellsData = new ArrayList<String>();
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public List<String> getGeoCellsData() {
+        return geoCellsData;
+    }
+
+    public void setGeoCellsData(List<String> geoCellsData) {
+        this.geoCellsData = geoCellsData;
+    }
+
 }

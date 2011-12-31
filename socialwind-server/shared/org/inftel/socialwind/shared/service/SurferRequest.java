@@ -24,5 +24,5 @@ public interface SurferRequest extends RequestContext {
 
     Request<Void> remove(SurferProxy surfer);
     
-    //Request<Void> updateSurferLocation(double latitude, double longitude);
+    Request<Void> setSurferLocation(double latitude, double longitude);
 }
