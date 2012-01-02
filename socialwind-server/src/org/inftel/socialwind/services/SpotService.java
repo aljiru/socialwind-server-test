@@ -2,6 +2,7 @@ package org.inftel.socialwind.services;
 
 import static com.beoui.geocell.GeocellManager.proximitySearch;
 
+import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.GeocellQuery;
 import com.beoui.geocell.model.Point;
 
@@ -75,10 +76,17 @@ public class SpotService {
     public static void persist(Spot instance) {
         EntityManager em = entityManager();
         try {
+            generateGeoCells(instance); // TODO actualizar geocells solo cuando se necesite
             em.persist(instance);
         } finally {
             em.close();
         }
+    }
+
+    private static void generateGeoCells(Spot instance) {
+        Point location = new Point(instance.getLatitude(), instance.getLongitude());
+        List<String> cells = GeocellManager.generateGeoCell(location);
+        instance.setGeoCellsData(cells);
     }
 
     public static void remove(Spot instance) {
@@ -95,7 +103,7 @@ public class SpotService {
         EntityManager em = entityManager();
         try {
             Point center = new Point(latitude, longitude);
-            GeocellQuery baseQuery = new GeocellQuery();
+            GeocellQuery baseQuery = new GeocellQuery(SELECT_ALL);
             List<Spot> spots = proximitySearch(center, 1, 500, Spot.class, baseQuery, em);
             if (spots.size() == 1) {
                 return spots.get(0);
@@ -143,12 +151,15 @@ public class SpotService {
      *            surfero al que se quiere añadir
      */
     static void addSurfer(Spot spot, Surfer surfer) {
-        if (!surfer.getActiveSession().getSpot().equals(spot)) {
-            throw new IllegalStateException("No se puede añadir un surfero que no esta en la playa");
+        EntityManager em = entityManager();
+        try {
+            spot.setSurferCount(spot.getSurferCount() + 1);
+            spot.setSurferCurrentCount(spot.getSurferCurrentCount() + 1);
+            updateHotState(spot);
+            em.persist(spot);
+        } finally {
+            em.close();
         }
-        spot.setSurferCount(spot.getSurferCount() + 1);
-        spot.setSurferCurrentCount(spot.getSurferCurrentCount() + 1);
-        updateHotState(spot);
     }
 
     /**

@@ -28,7 +28,7 @@ public class Spot extends JpaEntity {
     private List<String> geoCellsData = new ArrayList<String>();
 
     /** Si es true indica que la playa es hotspot */
-    private Boolean hot;
+    private Boolean hot = false;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -37,22 +37,22 @@ public class Spot extends JpaEntity {
     private String imgUrl;
 
     @Latitude
-    private Double latitude;
+    private double latitude;
 
     @Longitude
-    private Double longitude;
+    private double longitude;
 
     private String name;
 
     /** Contador de todos los surfer que han pasado por la playa */
-    private Integer surferCount;
+    private Integer surferCount = 0;
 
     /** Contador de todos los surfer que estan en la playa */
-    private Integer surferCurrentCount;
+    private Integer surferCurrentCount = 0;
 
     @Version
     private Long version;
-    
+
     public String getDescription() {
         return description;
     }
@@ -73,11 +73,11 @@ public class Spot extends JpaEntity {
         return imgUrl;
     }
 
-    public Double getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public Double getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
@@ -117,11 +117,11 @@ public class Spot extends JpaEntity {
         this.imgUrl = imgUrl;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
@@ -140,5 +140,5 @@ public class Spot extends JpaEntity {
     public void setVersion(Long version) {
         this.version = version;
     }
-
+    
 }

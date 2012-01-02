@@ -87,8 +87,8 @@ public class SessionService {
 
         // Create session and add data
         Session session = new Session();
-        session.setSurfer(surfer);
-        session.setSpot(spot);
+        session.setSurferId(surfer.getId());
+        session.setSpotId(spot.getId());
         session.setStart(new Date());
         persist(session);
 
@@ -96,8 +96,8 @@ public class SessionService {
         SpotService.addSurfer(spot, surfer);
 
         // Update surfer data
-        surfer.setActiveSession(session);
-        
+        surfer.setActiveSessionId(session.getId());
+
         return session;
     }
 
@@ -120,11 +120,11 @@ public class SessionService {
         persist(session);
 
         // Update spot data
-        SpotService.removeSurfer(session.getSpot(), surfer);
+        SpotService.removeSurfer(SpotService.findSpot(session.getSpotId()), surfer);
 
         // Update surfer data
-        surfer.setActiveSession(null);
-        
+        surfer.setActiveSessionId(null);
+
         return session;
     }
 
@@ -136,14 +136,10 @@ public class SessionService {
      * @return la sesion activa actual del surfero o <code>null</code> si no hay session activa
      */
     public static Session findActiveSession(Surfer surfer) {
-        EntityManager em = entityManager();
-        try {
-            // re-attach para asegurar poder cargar la sesion
-            Surfer attached = em.find(Surfer.class, surfer.getId());
-            return attached.getActiveSession();
-        } finally {
-            em.close();
+        if (surfer.getActiveSessionId() == null) {
+            return null;
         }
+        return SessionService.findSession(surfer.getActiveSessionId());
     }
 
     /**

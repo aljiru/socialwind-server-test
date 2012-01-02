@@ -3,6 +3,8 @@ package org.inftel.socialwind.services;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.Point;
 
+import static org.inftel.socialwind.services.SessionService.findActiveSession;
+
 import org.inftel.socialwind.server.domain.EMF;
 import org.inftel.socialwind.server.domain.Session;
 import org.inftel.socialwind.server.domain.Spot;
@@ -112,17 +114,18 @@ public class SurferService {
 
             // Se busca si la posicion forma parte de una playa
             Spot spot = SpotService.findSpotByLocation(latitude, longitude);
+            Session actual = findActiveSession(surfer);
 
             // Esta el surfer en una playa?
             if (SessionService.hasActiveSession(surfer)) {
                 // Ha salido o cambiado de playa el surfer?
-                if (spot == null || !spot.equals(surfer.getActiveSession().getSpot())) {
+                if (spot == null || spot.getId() != actual.getSpotId()) {
                     SessionService.endSession(surfer);
                 }
             }
 
             // Ha cambiado o entrado en una nueva playa?
-            if (spot != null && !spot.equals(surfer.getActiveSession().getSpot())) {
+            if (spot != null && (actual == null || spot.getId() != actual.getSpotId())) {
                 session = SessionService.beginSession(surfer, spot);
             }
 
@@ -131,7 +134,7 @@ public class SurferService {
         }
         return session;
     }
-    
+
     public static List<Session> sessions(Surfer surfer) {
         return SessionService.findSessionsBySurfer(surfer);
     }

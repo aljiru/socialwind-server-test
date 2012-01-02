@@ -14,11 +14,8 @@ import org.inftel.socialwind.RequestFactoryHelper;
 import org.inftel.socialwind.shared.domain.SurferProxy;
 import org.inftel.socialwind.shared.service.SocialwindRequestFactory;
 import org.inftel.socialwind.shared.service.SurferRequest;
-import org.mockito.Mockito;
-import org.mockito.internal.util.MockUtil;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * 
@@ -58,7 +55,7 @@ public class SurferRequestTest extends LocalDataStoreTestCase {
     public void testSurferRequest() {
         SocialwindRequestFactory swrf = get();
         SurferRequest request = swrf.surferRequest();
-        SurferProxy surfer = request.create(SurferProxy.class);
+        final SurferProxy surfer = request.create(SurferProxy.class);
         surfer.setEmail("test@email.com");
 
         // Intento de guardar entidad
@@ -74,13 +71,13 @@ public class SurferRequestTest extends LocalDataStoreTestCase {
         });
 
         request = swrf.surferRequest();
-        final List<SurferProxy> findedList = new Vector<SurferProxy>(1);
 
         // Intento de buscar la entidad guardada
         request.find(surfer.stableId()).fire(new Receiver<SurferProxy>() {
             @Override
             public void onSuccess(SurferProxy response) {
-                findedList.add(response);
+                assertNotNull(response);
+                assertEquals(surfer.getEmail(), response.getEmail());
             }
         });
 
@@ -90,12 +87,10 @@ public class SurferRequestTest extends LocalDataStoreTestCase {
         request.findAllSurfers().fire(new Receiver<List<SurferProxy>>() {
             @Override
             public void onSuccess(List<SurferProxy> response) {
-                Object o = response;
+                assertTrue(response.size() > 0);
             }
         });
 
-        assertTrue(findedList.size() > 0);
-        assertEquals(surfer.getEmail(), findedList.get(0).getEmail());
     }
 
     /**
@@ -103,9 +98,9 @@ public class SurferRequestTest extends LocalDataStoreTestCase {
      */
     public void testCountSurfers() {
         // Crear resultados del back-end
-        Long count = Long.valueOf(42);
+        // Long count = Long.valueOf(42);
         // Instrumentar la simulacion del back-end
-        //Mockito.when(service.countSurfers()).thenReturn(count);
+        // Mockito.when(service.countSurfers()).thenReturn(count);
     }
 
 }

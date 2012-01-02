@@ -1,13 +1,17 @@
 package org.inftel.socialwind.server.domain;
 
+import org.inftel.socialwind.services.SpotService;
+import org.inftel.socialwind.services.SurferService;
+
 import java.util.Date;
+
+import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 /**
@@ -26,19 +30,25 @@ public class Session extends JpaEntity {
     private Date end;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    /** Spot donde tiene lugar la sesion */
-    @OneToMany
+    @Transient
     private Spot spot;
+
+    /** Spot donde tiene lugar la sesion */
+    // @OneToMany
+    private Long spotId;
 
     /** Hora inicio de la sesion */
     private Date start;
 
-    /** Surfer que protagoniza la sesion */
-    @OneToMany
+    @Transient
     private Surfer surfer;
+
+    /** Surfer que protagoniza la sesion */
+    // @OneToMany
+    private Long surferId;
 
     @Version
     private Long version;
@@ -52,7 +62,27 @@ public class Session extends JpaEntity {
     }
 
     public Spot getSpot() {
+        if (spotId == null) {
+            return null;
+        }
+        if (spot == null) {
+            spot = SpotService.findSpot(getSpotId());
+        }
         return spot;
+    }
+
+    public void setSpot(Spot spot) {
+        if (spot == null) {
+            this.spot = null;
+            this.spotId = null;
+        } else {
+            this.spot = spot;
+            this.spotId = spot.getId();
+        }
+    }
+
+    public Long getSpotId() {
+        return spotId;
     }
 
     public Date getStart() {
@@ -60,7 +90,27 @@ public class Session extends JpaEntity {
     }
 
     public Surfer getSurfer() {
+        if (getSurferId() == null) {
+            return null;
+        }
+        if (surfer == null) {
+            surfer = SurferService.findSurfer(getSpotId());
+        }
         return surfer;
+    }
+
+    public void setSurfer(Surfer surfer) {
+        if (surfer == null) {
+            this.surfer = null;
+            this.surferId = null;
+        } else {
+            this.surfer = surfer;
+            this.surferId = surfer.getId();
+        }
+    }
+
+    public Long getSurferId() {
+        return surferId;
     }
 
     public Long getVersion() {
@@ -75,24 +125,22 @@ public class Session extends JpaEntity {
         this.id = id;
     }
 
-    public void setSpot(Spot spot) {
-        this.spot = spot;
+    public void setSpotId(Long spotId) {
+        this.spotId = spotId;
+        this.spot = null;
     }
 
     public void setStart(Date start) {
         this.start = start;
     }
 
-    public void setSurfer(Surfer surfer) {
-        this.surfer = surfer;
+    public void setSurferId(Long surferId) {
+        this.surferId = surferId;
+        this.surfer = null;
     }
 
     public void setVersion(Long version) {
         this.version = version;
-    }
-
-    public String getSurferName() {
-        return surfer.getDisplayName();
     }
 
 }

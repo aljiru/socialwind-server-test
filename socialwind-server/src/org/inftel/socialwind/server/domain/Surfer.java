@@ -6,10 +6,8 @@ import com.beoui.geocell.annotations.Longitude;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Entity;
@@ -33,11 +31,8 @@ import javax.persistence.Version;
 @Table(name = "surfers")
 public class Surfer extends JpaEntity {
 
-    @OneToMany(fetch = LAZY)
-    public Session activeSession;
-
-    @OneToMany(mappedBy = "surfer")
-    public Set<Session> sessions;
+    // @OneToOne
+    private Long activeSessionId;
 
     private String displayName;
 
@@ -52,18 +47,18 @@ public class Surfer extends JpaEntity {
     private Long id;
 
     @Latitude
-    private Double latitude;
+    private double latitude;
 
     @Longitude
-    private Double longitude;
+    private double longitude;
 
     private String userName;
 
     @Version
     private Long version;
 
-    public Session getActiveSession() {
-        return activeSession;
+    public Long getActiveSessionId() {
+        return activeSessionId;
     }
 
     public String getDisplayName() {
@@ -82,16 +77,12 @@ public class Surfer extends JpaEntity {
         return id;
     }
 
-    public Double getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public Double getLongitude() {
+    public double getLongitude() {
         return longitude;
-    }
-
-    public Set<Session> getSessions() {
-        return sessions;
     }
 
     public String getUserName() {
@@ -102,8 +93,8 @@ public class Surfer extends JpaEntity {
         return version;
     }
 
-    public void setActiveSession(Session currentSession) {
-        this.activeSession = currentSession;
+    public void setActiveSessionId(Long sessionId) {
+        this.activeSessionId = sessionId;
     }
 
     public void setDisplayName(String displayName) {
@@ -122,16 +113,12 @@ public class Surfer extends JpaEntity {
         this.id = id;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public void setSessions(Set<Session> sessions) {
-        this.sessions = sessions;
     }
 
     public void setUserName(String userName) {

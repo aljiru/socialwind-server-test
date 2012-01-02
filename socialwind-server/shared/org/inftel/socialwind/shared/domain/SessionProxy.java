@@ -23,8 +23,6 @@ public interface SessionProxy extends EntityProxy {
     
     Date getEnd();
     
-    String getSurferName();
-    
     SpotProxy getSpot();
 
 }
