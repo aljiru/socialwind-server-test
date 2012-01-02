@@ -4,6 +4,7 @@ import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.Point;
 
 import org.inftel.socialwind.server.domain.EMF;
+import org.inftel.socialwind.server.domain.Session;
 import org.inftel.socialwind.server.domain.Spot;
 import org.inftel.socialwind.server.domain.Surfer;
 
@@ -13,7 +14,7 @@ import javax.persistence.EntityManager;
 
 public class SurferService {
 
-    private static final String SELECT_ONE = "select o from Surfer o";
+    private static final String SELECT_ALL = "select o from Surfer o";
     private static final String SELECT_COUNT = "select count(o) from Surfer o";
 
     public static final EntityManager entityManager() {
@@ -33,7 +34,7 @@ public class SurferService {
         EntityManager em = entityManager();
         try {
             @SuppressWarnings("unchecked")
-            List<Surfer> surferList = em.createQuery(SELECT_ONE).getResultList();
+            List<Surfer> surferList = em.createQuery(SELECT_ALL).getResultList();
             surferList.size(); // forzar materializar resultados
             return surferList;
         } finally {
@@ -57,7 +58,7 @@ public class SurferService {
         EntityManager em = entityManager();
         try {
             @SuppressWarnings("unchecked")
-            List<Surfer> resultList = em.createQuery(SELECT_ONE).setFirstResult(firstResult)
+            List<Surfer> resultList = em.createQuery(SELECT_ALL).setFirstResult(firstResult)
                     .setMaxResults(maxResults).getResultList();
             resultList.size(); // forzar materializar resultados
             return resultList;
@@ -85,8 +86,17 @@ public class SurferService {
         }
     }
 
-    public static void setSurferLocation(Surfer instance, double latitude, double longitude) {
+    /**
+     * Actualiza la posición del surfero. En caso de que el surfero entre o salga de una playa se
+     * actualizara el estado de estas playas.
+     * 
+     * @param surfer
+     * @param latitude
+     * @param longitude
+     */
+    public static Session updateSurferLocation(Surfer surfer, double latitude, double longitude) {
         EntityManager em = entityManager();
+        Session session = null;
         try {
 
             // Location as a Point
@@ -96,16 +106,34 @@ public class SurferService {
             List<String> cells = GeocellManager.generateGeoCell(location);
 
             // Save instance
-            instance.setLatitude(latitude);
-            instance.setLongitude(longitude);
-            instance.setGeoCellsData(cells);
-            
+            surfer.setLatitude(latitude);
+            surfer.setLongitude(longitude);
+            surfer.setGeoCellsData(cells);
+
             // Se busca si la posicion forma parte de una playa
             Spot spot = SpotService.findSpotByLocation(latitude, longitude);
+
+            // Esta el surfer en una playa?
+            if (SessionService.hasActiveSession(surfer)) {
+                // Ha salido o cambiado de playa el surfer?
+                if (spot == null || !spot.equals(surfer.getActiveSession().getSpot())) {
+                    SessionService.endSession(surfer);
+                }
+            }
+
+            // Ha cambiado o entrado en una nueva playa?
+            if (spot != null && !spot.equals(surfer.getActiveSession().getSpot())) {
+                session = SessionService.beginSession(surfer, spot);
+            }
 
         } finally {
             em.close();
         }
+        return session;
     }
     
+    public static List<Session> sessions(Surfer surfer) {
+        return SessionService.findSessionsBySurfer(surfer);
+    }
+
 }

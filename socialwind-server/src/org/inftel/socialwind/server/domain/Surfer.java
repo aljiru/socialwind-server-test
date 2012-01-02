@@ -6,11 +6,14 @@ import com.beoui.geocell.annotations.Longitude;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -30,20 +33,38 @@ import javax.persistence.Version;
 @Table(name = "surfers")
 public class Surfer extends JpaEntity {
 
+    @OneToMany(fetch = LAZY)
+    public Session activeSession;
+
+    @OneToMany(mappedBy = "surfer")
+    public Set<Session> sessions;
+
     private String displayName;
 
     private String email;
 
+    @Geocells
+    @OneToMany(fetch = EAGER)
+    private List<String> geoCellsData = new ArrayList<String>();
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Latitude
+    private Double latitude;
+
+    @Longitude
+    private Double longitude;
 
     private String userName;
 
     @Version
     private Long version;
 
-    private Long currentSpotId;
+    public Session getActiveSession() {
+        return activeSession;
+    }
 
     public String getDisplayName() {
         return displayName;
@@ -53,8 +74,24 @@ public class Surfer extends JpaEntity {
         return email;
     }
 
+    public List<String> getGeoCellsData() {
+        return geoCellsData;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public Set<Session> getSessions() {
+        return sessions;
     }
 
     public String getUserName() {
@@ -65,6 +102,10 @@ public class Surfer extends JpaEntity {
         return version;
     }
 
+    public void setActiveSession(Session currentSession) {
+        this.activeSession = currentSession;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -73,8 +114,24 @@ public class Surfer extends JpaEntity {
         this.email = email;
     }
 
+    public void setGeoCellsData(List<String> geoCellsData) {
+        this.geoCellsData = geoCellsData;
+    }
+
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setSessions(Set<Session> sessions) {
+        this.sessions = sessions;
     }
 
     public void setUserName(String userName) {
@@ -83,48 +140,6 @@ public class Surfer extends JpaEntity {
 
     public void setVersion(Long version) {
         this.version = version;
-    }
-
-    public void setCurrentSpotId(Long currentSpotId) {
-        this.currentSpotId = currentSpotId;
-    }
-
-    public Long getCurrentSpotId() {
-        return currentSpotId;
-    }
-
-    @Longitude
-    private Double longitude;
-
-    @Latitude
-    private Double latitude;
-
-    @Geocells
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<String> geoCellsData = new ArrayList<String>();
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public List<String> getGeoCellsData() {
-        return geoCellsData;
-    }
-
-    public void setGeoCellsData(List<String> geoCellsData) {
-        this.geoCellsData = geoCellsData;
     }
 
 }
