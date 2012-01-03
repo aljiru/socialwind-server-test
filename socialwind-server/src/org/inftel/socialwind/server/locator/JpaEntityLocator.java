@@ -2,7 +2,7 @@ package org.inftel.socialwind.server.locator;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
 
-import org.inftel.socialwind.server.domain.EMF;
+import org.inftel.socialwind.server.domain.ThreadLocalEntityManager;
 import org.inftel.socialwind.server.domain.BaseEntity;
 
 import javax.persistence.EntityManager;
@@ -11,8 +11,8 @@ import javax.persistence.EntityManager;
  * Servicio de utilidad utilizado por RequestFactory que sirve para obtener las entidades
  * persistentes.<br>
  * 
- * Se ha usado una versión generica para todas las entidades que hereden de {@link BaseEntity} ya que
- * el gestor JPA permite realizar de forma sencilla la generalización.<br>
+ * Se ha usado una versión generica para todas las entidades que hereden de {@link BaseEntity} ya
+ * que el gestor JPA permite realizar de forma sencilla la generalización.<br>
  * 
  * El siguiente enlace contiene una post con un ejemplo basico de localizador JPA generico
  * http://www.devsniper.com/generic-entity-locator-for-request-factory-in-gwt/
@@ -23,7 +23,7 @@ import javax.persistence.EntityManager;
 public class JpaEntityLocator extends Locator<BaseEntity, Long> {
 
     public static final EntityManager entityManager() {
-        return EMF.get().createEntityManager();
+        return ThreadLocalEntityManager.get();
     }
 
     @Override
@@ -40,11 +40,7 @@ public class JpaEntityLocator extends Locator<BaseEntity, Long> {
     @Override
     public BaseEntity find(Class<? extends BaseEntity> clazz, Long id) {
         EntityManager em = entityManager();
-        try {
-            return em.find(clazz, id);
-        } finally {
-            em.close();
-        }
+        return em.find(clazz, id);
     }
 
     // https://groups.google.com/forum/#!topic/google-web-toolkit/SGMsIBaJ4hI
@@ -68,5 +64,5 @@ public class JpaEntityLocator extends Locator<BaseEntity, Long> {
     public Object getVersion(BaseEntity domainObject) {
         return domainObject.getVersion();
     }
-    
+
 }

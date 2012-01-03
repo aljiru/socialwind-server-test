@@ -6,9 +6,9 @@ import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.GeocellQuery;
 import com.beoui.geocell.model.Point;
 
-import org.inftel.socialwind.server.domain.EMF;
 import org.inftel.socialwind.server.domain.Spot;
 import org.inftel.socialwind.server.domain.Surfer;
+import org.inftel.socialwind.server.domain.ThreadLocalEntityManager;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,28 +24,20 @@ public class SpotService {
     private static final Integer HOTSPOT_SURFERS_LIMIT = 5;
 
     public static final EntityManager entityManager() {
-        return EMF.get().createEntityManager();
+        return ThreadLocalEntityManager.get();
     }
 
     public static Long countSpots() {
         EntityManager em = entityManager();
-        try {
-            return ((Number) em.createQuery(SELECT_COUNT).getSingleResult()).longValue();
-        } finally {
-            em.close();
-        }
+        return ((Number) em.createQuery(SELECT_COUNT).getSingleResult()).longValue();
     }
 
     public static List<Spot> findAllSpots() {
         EntityManager em = entityManager();
-        try {
-            @SuppressWarnings("unchecked")
-            List<Spot> SpotList = em.createQuery(SELECT_ALL).getResultList();
-            SpotList.size(); // forzar materializar resultados
-            return SpotList;
-        } finally {
-            em.close();
-        }
+        @SuppressWarnings("unchecked")
+        List<Spot> SpotList = em.createQuery(SELECT_ALL).getResultList();
+        SpotList.size(); // forzar materializar resultados
+        return SpotList;
     }
 
     public static Spot findSpot(Long id) {
@@ -53,34 +45,23 @@ public class SpotService {
             return null;
         }
         EntityManager em = entityManager();
-        try {
-            return em.find(Spot.class, id);
-        } finally {
-            em.close();
-        }
+        return em.find(Spot.class, id);
     }
 
     public static List<Spot> findSpotEntries(int firstResult, int maxResults) {
         EntityManager em = entityManager();
-        try {
-            @SuppressWarnings("unchecked")
-            List<Spot> resultList = em.createQuery(SELECT_ALL).setFirstResult(firstResult)
-                    .setMaxResults(maxResults).getResultList();
-            resultList.size(); // forzar materializar resultados
-            return resultList;
-        } finally {
-            em.close();
-        }
+        @SuppressWarnings("unchecked")
+        List<Spot> resultList = em.createQuery(SELECT_ALL).setFirstResult(firstResult)
+                .setMaxResults(maxResults).getResultList();
+        resultList.size(); // forzar materializar resultados
+        return resultList;
     }
 
     public static void persist(Spot instance) {
         EntityManager em = entityManager();
-        try {
-            generateGeoCells(instance); // TODO actualizar geocells solo cuando se necesite
-            em.persist(instance);
-        } finally {
-            em.close();
-        }
+        generateGeoCells(instance); // TODO actualizar geocells solo cuando se necesite
+        em.persist(instance);
+        em.refresh(instance);
     }
 
     private static void generateGeoCells(Spot instance) {
@@ -91,54 +72,38 @@ public class SpotService {
 
     public static void remove(Spot instance) {
         EntityManager em = entityManager();
-        try {
-            Spot attached = em.find(Spot.class, instance.getId());
-            em.remove(attached);
-        } finally {
-            em.close();
-        }
+        Spot attached = em.find(Spot.class, instance.getId());
+        em.remove(attached);
     }
 
     public static Spot findSpotByLocation(double latitude, double longitude) {
         EntityManager em = entityManager();
-        try {
-            Point center = new Point(latitude, longitude);
-            GeocellQuery baseQuery = new GeocellQuery(SELECT_ALL);
-            List<Spot> spots = proximitySearch(center, 1, 500, Spot.class, baseQuery, em);
-            if (spots.size() == 1) {
-                return spots.get(0);
-            } else {
-                return null;
-            }
-        } finally {
-            em.close();
+        Point center = new Point(latitude, longitude);
+        GeocellQuery baseQuery = new GeocellQuery(SELECT_ALL);
+        List<Spot> spots = proximitySearch(center, 1, 500, Spot.class, baseQuery, em);
+        if (spots.size() == 1) {
+            return spots.get(0);
+        } else {
+            return null;
         }
     }
 
     public static List<Spot> findNearbySpots(double latitude, double longitude) {
         EntityManager em = entityManager();
-        try {
-            Point center = new Point(latitude, longitude);
-            GeocellQuery baseQuery = new GeocellQuery();
-            List<Spot> spots = proximitySearch(center, 100, 0, Spot.class, baseQuery, em);
-            spots.size(); // materializar resultados
-            return spots;
-        } finally {
-            em.close();
-        }
+        Point center = new Point(latitude, longitude);
+        GeocellQuery baseQuery = new GeocellQuery();
+        List<Spot> spots = proximitySearch(center, 100, 0, Spot.class, baseQuery, em);
+        spots.size(); // materializar resultados
+        return spots;
     }
 
     public static List<Spot> findNearbyHotSpots(double latitude, double longitude) {
         EntityManager em = entityManager();
-        try {
-            Point center = new Point(latitude, longitude);
-            GeocellQuery baseQuery = new GeocellQuery("hot == true");
-            List<Spot> spots = proximitySearch(center, 100, 0, Spot.class, baseQuery, em);
-            spots.size(); // materializar resultados
-            return spots;
-        } finally {
-            em.close();
-        }
+        Point center = new Point(latitude, longitude);
+        GeocellQuery baseQuery = new GeocellQuery("hot == true");
+        List<Spot> spots = proximitySearch(center, 100, 0, Spot.class, baseQuery, em);
+        spots.size(); // materializar resultados
+        return spots;
     }
 
     /**
@@ -152,14 +117,10 @@ public class SpotService {
      */
     static void addSurfer(Spot spot, Surfer surfer) {
         EntityManager em = entityManager();
-        try {
-            spot.setSurferCount(spot.getSurferCount() + 1);
-            spot.setSurferCurrentCount(spot.getSurferCurrentCount() + 1);
-            updateHotState(spot);
-            em.persist(spot);
-        } finally {
-            em.close();
-        }
+        spot.setSurferCount(spot.getSurferCount() + 1);
+        spot.setSurferCurrentCount(spot.getSurferCurrentCount() + 1);
+        updateHotState(spot);
+        em.persist(spot);
     }
 
     /**
@@ -190,7 +151,7 @@ public class SpotService {
         // Actualizar estado hotspot
         if (spot.getHot() && spot.getSurferCurrentCount() < HOTSPOT_SURFERS_LIMIT) {
             spot.setHot(false);
-        } else if (!spot.getHot() && spot.getSurferCurrentCount() < HOTSPOT_SURFERS_LIMIT) {
+        } else if (!spot.getHot() && spot.getSurferCurrentCount() > HOTSPOT_SURFERS_LIMIT) {
             spot.setHot(true);
         }
     }

@@ -1,9 +1,9 @@
 package org.inftel.socialwind.services;
 
-import org.inftel.socialwind.server.domain.EMF;
 import org.inftel.socialwind.server.domain.Session;
 import org.inftel.socialwind.server.domain.Spot;
 import org.inftel.socialwind.server.domain.Surfer;
+import org.inftel.socialwind.server.domain.ThreadLocalEntityManager;
 
 import java.util.Date;
 import java.util.List;
@@ -24,19 +24,15 @@ public class SessionService {
     private static final String SELECT_ALL = "select o from Session o";
 
     public static final EntityManager entityManager() {
-        return EMF.get().createEntityManager();
+        return ThreadLocalEntityManager.get();
     }
 
     public static List<Session> findAllSessions() {
         EntityManager em = entityManager();
-        try {
-            @SuppressWarnings("unchecked")
-            List<Session> SessionList = em.createQuery(SELECT_ALL).getResultList();
-            SessionList.size(); // forzar materializar resultados
-            return SessionList;
-        } finally {
-            em.close();
-        }
+        @SuppressWarnings("unchecked")
+        List<Session> SessionList = em.createQuery(SELECT_ALL).getResultList();
+        SessionList.size(); // forzar materializar resultados
+        return SessionList;
     }
 
     public static Session findSession(Long id) {
@@ -44,30 +40,19 @@ public class SessionService {
             return null;
         }
         EntityManager em = entityManager();
-        try {
-            return em.find(Session.class, id);
-        } finally {
-            em.close();
-        }
+        return em.find(Session.class, id);
     }
 
     public static void persist(Session instance) {
         EntityManager em = entityManager();
-        try {
-            em.persist(instance);
-        } finally {
-            em.close();
-        }
+        em.persist(instance);
+        em.refresh(instance);
     }
 
     public static void remove(Session instance) {
         EntityManager em = entityManager();
-        try {
-            Session attached = em.find(Session.class, instance.getId());
-            em.remove(attached);
-        } finally {
-            em.close();
-        }
+        Session attached = em.find(Session.class, instance.getId());
+        em.remove(attached);
     }
 
     /**
@@ -117,10 +102,9 @@ public class SessionService {
         // Find session and finalize
         Session session = findActiveSession(surfer);
         session.setEnd(new Date());
-        persist(session);
 
         // Update spot data
-        SpotService.removeSurfer(SpotService.findSpot(session.getSpotId()), surfer);
+        SpotService.removeSurfer(session.getSpot(), surfer);
 
         // Update surfer data
         surfer.setActiveSessionId(null);
@@ -156,16 +140,12 @@ public class SessionService {
 
     public static List<Session> findSessionsBySurfer(Surfer surfer) {
         EntityManager em = entityManager();
-        try {
-            Query query = em.createQuery(SELECT_SESSIONS_BY_SURFER);
-            query.setParameter("surfer", surfer);
-            @SuppressWarnings("unchecked")
-            List<Session> resultList = query.getResultList();
-            resultList.size(); // force it to materialize
-            return resultList;
-        } finally {
-            em.close();
-        }
+        Query query = em.createQuery(SELECT_SESSIONS_BY_SURFER);
+        query.setParameter("surfer", surfer);
+        @SuppressWarnings("unchecked")
+        List<Session> resultList = query.getResultList();
+        resultList.size(); // force it to materialize
+        return resultList;
     }
 
 }

@@ -68,11 +68,11 @@ public class Session extends BaseEntity {
     }
 
     public Surfer getSurfer() {
-        if (getSurferId() == null) {
+        if (surferId == null) {
             return null;
         }
         if (surfer == null) {
-            surfer = SurferService.findSurfer(getSpotId());
+            surfer = SurferService.findSurfer(getSurferId());
         }
         return surfer;
     }
