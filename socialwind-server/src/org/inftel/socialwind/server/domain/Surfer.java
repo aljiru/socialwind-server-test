@@ -8,11 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -29,7 +26,7 @@ import javax.persistence.Version;
  */
 @Entity
 @Table(name = "surfers")
-public class Surfer extends JpaEntity {
+public class Surfer extends BaseEntity {
 
     // @OneToOne
     private Long activeSessionId;
@@ -42,10 +39,7 @@ public class Surfer extends JpaEntity {
     @OneToMany(fetch = EAGER)
     private List<String> geoCellsData = new ArrayList<String>();
 
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-
+   
     @Latitude
     private double latitude;
 
@@ -73,9 +67,6 @@ public class Surfer extends JpaEntity {
         return geoCellsData;
     }
 
-    public Long getId() {
-        return id;
-    }
 
     public double getLatitude() {
         return latitude;
@@ -109,9 +100,6 @@ public class Surfer extends JpaEntity {
         this.geoCellsData = geoCellsData;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;

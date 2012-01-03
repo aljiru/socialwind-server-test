@@ -5,11 +5,7 @@ import org.inftel.socialwind.services.SurferService;
 
 import java.util.Date;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
@@ -24,14 +20,10 @@ import javax.persistence.Version;
  */
 @Entity
 @Table(name = "sessions")
-public class Session extends JpaEntity {
+public class Session extends BaseEntity {
 
     /** Hora fin de la sesion */
     private Date end;
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Transient
     private Spot spot;
@@ -57,10 +49,6 @@ public class Session extends JpaEntity {
         return end;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public Spot getSpot() {
         if (spotId == null) {
             return null;
@@ -69,16 +57,6 @@ public class Session extends JpaEntity {
             spot = SpotService.findSpot(getSpotId());
         }
         return spot;
-    }
-
-    public void setSpot(Spot spot) {
-        if (spot == null) {
-            this.spot = null;
-            this.spotId = null;
-        } else {
-            this.spot = spot;
-            this.spotId = spot.getId();
-        }
     }
 
     public Long getSpotId() {
@@ -99,16 +77,6 @@ public class Session extends JpaEntity {
         return surfer;
     }
 
-    public void setSurfer(Surfer surfer) {
-        if (surfer == null) {
-            this.surfer = null;
-            this.surferId = null;
-        } else {
-            this.surfer = surfer;
-            this.surferId = surfer.getId();
-        }
-    }
-
     public Long getSurferId() {
         return surferId;
     }
@@ -121,8 +89,14 @@ public class Session extends JpaEntity {
         this.end = end;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setSpot(Spot spot) {
+        if (spot == null) {
+            this.spot = null;
+            this.spotId = null;
+        } else {
+            this.spot = spot;
+            this.spotId = spot.getId();
+        }
     }
 
     public void setSpotId(Long spotId) {
@@ -132,6 +106,16 @@ public class Session extends JpaEntity {
 
     public void setStart(Date start) {
         this.start = start;
+    }
+
+    public void setSurfer(Surfer surfer) {
+        if (surfer == null) {
+            this.surfer = null;
+            this.surferId = null;
+        } else {
+            this.surfer = surfer;
+            this.surferId = surfer.getId();
+        }
     }
 
     public void setSurferId(Long surferId) {

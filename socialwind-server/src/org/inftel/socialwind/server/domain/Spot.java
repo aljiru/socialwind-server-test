@@ -8,18 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
 @Table(name = "spots")
-public class Spot extends JpaEntity {
+public class Spot extends BaseEntity {
 
     private String description;
 
@@ -29,10 +26,6 @@ public class Spot extends JpaEntity {
 
     /** Si es true indica que la playa es hotspot */
     private Boolean hot = false;
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     private String imgUrl;
 
@@ -63,10 +56,6 @@ public class Spot extends JpaEntity {
 
     public Boolean getHot() {
         return hot;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getImgUrl() {
@@ -109,10 +98,6 @@ public class Spot extends JpaEntity {
         this.hot = hot;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
@@ -140,5 +125,5 @@ public class Spot extends JpaEntity {
     public void setVersion(Long version) {
         this.version = version;
     }
-    
+
 }
