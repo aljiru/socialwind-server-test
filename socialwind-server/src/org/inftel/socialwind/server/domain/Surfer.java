@@ -1,13 +1,16 @@
 package org.inftel.socialwind.server.domain;
 
-import java.util.Date;
+import com.beoui.geocell.annotations.Geocells;
+import com.beoui.geocell.annotations.Latitude;
+import com.beoui.geocell.annotations.Longitude;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.FetchType.EAGER;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -23,23 +26,35 @@ import javax.persistence.Version;
  */
 @Entity
 @Table(name = "surfers")
-public class Surfer extends JpaEntity {
+public class Surfer extends BaseEntity {
+
+    // @OneToOne
+    private Long activeSessionId;
 
     private String displayName;
 
     private String email;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Geocells
+    @OneToMany(fetch = EAGER)
+    private List<String> geoCellsData = new ArrayList<String>();
+
+   
+    @Latitude
+    private double latitude;
+
+    @Longitude
+    private double longitude;
 
     private String userName;
 
     @Version
     private Long version;
-    
-    private Long currentSpotId;
-    
+
+    public Long getActiveSessionId() {
+        return activeSessionId;
+    }
+
     public String getDisplayName() {
         return displayName;
     }
@@ -48,8 +63,17 @@ public class Surfer extends JpaEntity {
         return email;
     }
 
-    public Long getId() {
-        return id;
+    public List<String> getGeoCellsData() {
+        return geoCellsData;
+    }
+
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public String getUserName() {
@@ -60,6 +84,10 @@ public class Surfer extends JpaEntity {
         return version;
     }
 
+    public void setActiveSessionId(Long sessionId) {
+        this.activeSessionId = sessionId;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -68,8 +96,17 @@ public class Surfer extends JpaEntity {
         this.email = email;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGeoCellsData(List<String> geoCellsData) {
+        this.geoCellsData = geoCellsData;
+    }
+
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public void setUserName(String userName) {
@@ -80,11 +117,4 @@ public class Surfer extends JpaEntity {
         this.version = version;
     }
 
-    public void setCurrentSpotId(Long currentSpotId) {
-        this.currentSpotId = currentSpotId;
-    }
-
-    public Long getCurrentSpotId() {
-        return currentSpotId;
-    }
 }
