@@ -4,6 +4,8 @@ import com.beoui.geocell.annotations.Geocells;
 import com.beoui.geocell.annotations.Latitude;
 import com.beoui.geocell.annotations.Longitude;
 
+import org.inftel.socialwind.server.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import static javax.persistence.FetchType.EAGER;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 /**
@@ -38,15 +41,17 @@ public class Surfer extends BaseEntity {
     @Geocells
     @OneToMany(fetch = EAGER)
     private List<String> geoCellsData = new ArrayList<String>();
-
    
     @Latitude
     private double latitude;
 
     @Longitude
     private double longitude;
+    
+    @Transient
+    private Location location;
 
-    private String userName;
+    private String fullName;
 
     @Version
     private Long version;
@@ -66,6 +71,14 @@ public class Surfer extends BaseEntity {
     public List<String> getGeoCellsData() {
         return geoCellsData;
     }
+    
+    public String getGravatarHash() {
+        if (getEmail() == null) {
+            return "";
+        } else {
+            return Utils.md5Hex(getEmail().trim().toLowerCase());
+        }
+    }
 
 
     public double getLatitude() {
@@ -75,9 +88,18 @@ public class Surfer extends BaseEntity {
     public double getLongitude() {
         return longitude;
     }
+    
+    public Location getLocation() {
+        if (location == null) {
+            location = new Location();
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+        }
+        return location;
+    }
 
-    public String getUserName() {
-        return userName;
+    public String getFullName() {
+        return fullName;
     }
 
     public Long getVersion() {
@@ -103,14 +125,16 @@ public class Surfer extends BaseEntity {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+        this.location = null;
     }
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+        this.location = null;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public void setVersion(Long version) {

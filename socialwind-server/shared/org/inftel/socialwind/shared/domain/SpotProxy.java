@@ -28,5 +28,15 @@ public interface SpotProxy extends EntityProxy {
     String getImgUrl();
 
     void setImgUrl(String imgUrl);
+    
+    void setLocation(LocationProxy location);
+    
+    Boolean getHot();
+    
+    public Integer getSurferCount();
+
+    public Integer getSurferCurrentCount();
+    
+    LocationProxy getLocation();
 
 }

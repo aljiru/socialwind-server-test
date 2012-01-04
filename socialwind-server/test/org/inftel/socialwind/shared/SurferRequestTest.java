@@ -87,7 +87,7 @@ public class SurferRequestTest {
         SocialwindRequestFactory swrf = get();
         SurferRequest request = swrf.surferRequest();
         final SurferProxy surfer = request.create(SurferProxy.class);
-        surfer.setEmail("test@email.com");
+        surfer.setDisplayName("ibaca");
 
         // Intento de guardar entidad
         request.persist(surfer).fire(new Receiver<Void>() {
@@ -108,7 +108,7 @@ public class SurferRequestTest {
             @Override
             public void onSuccess(SurferProxy response) {
                 assertNotNull(response);
-                assertEquals(surfer.getEmail(), response.getEmail());
+                assertEquals(surfer.getDisplayName(), response.getDisplayName());
             }
         });
 
