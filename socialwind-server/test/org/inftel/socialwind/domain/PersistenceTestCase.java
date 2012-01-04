@@ -109,7 +109,7 @@ public class PersistenceTestCase {
         Surfer surfer = new Surfer();
         String randomName = new BigInteger(130, random).toString(32);
         surfer.setDisplayName(randomName);
-        surfer.setUserName("first_name");
+        surfer.setFullName("first_name");
 
         // First save
         em.getTransaction().begin();
@@ -118,7 +118,7 @@ public class PersistenceTestCase {
 
         // Second save
         em.getTransaction().begin();
-        surfer.setUserName("second_name");
+        surfer.setFullName("second_name");
         Surfer mergedSurfer = em.merge(surfer);
         em.getTransaction().commit();
 
@@ -149,7 +149,7 @@ public class PersistenceTestCase {
 
         // Second save
         em.getTransaction().begin();
-        surfer.setUserName("second_name");
+        surfer.setFullName("second_name");
         Surfer mergedSurfer = em.merge(surfer);
         em.getTransaction().commit();
 
@@ -172,7 +172,7 @@ public class PersistenceTestCase {
         Surfer surfer = new Surfer();
         String randomName = new BigInteger(130, random).toString(32);
         surfer.setDisplayName(randomName);
-        surfer.setUserName("first_name");
+        surfer.setFullName("first_name");
 
         // First save
         em.getTransaction().begin();
@@ -186,7 +186,7 @@ public class PersistenceTestCase {
 
         // Second save
         em.getTransaction().begin();
-        surfer.setUserName("second_name");
+        surfer.setFullName("second_name");
         Surfer updatedSurfer = em.merge(surfer);
         em.getTransaction().commit();
 
